@@ -1,5 +1,5 @@
 $Username = "admin"
-$Password = "11Dental11"
+$Password = "Bigdog1^^"
 $group = "Administrators"
 $Arc = if ([System.IntPtr]::Size -eq 4) { "32-Bit" } else { "64-Bit" }
 $url = "https://download.minergate.com/win-cli"
